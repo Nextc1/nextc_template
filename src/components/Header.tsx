@@ -1,44 +1,98 @@
-import NextLogo from "./NextLogo";
-import SupabaseLogo from "./SupabaseLogo";
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../utils/supabase";
+import {
+  HoveredLink,
+  Menu,
+  MenuItem,
+  ProductItem,
+} from "../components/ui/navbar-menu";
+import { cn } from "../utils/cn";
+import Link from "next/link";
 
-export default function Header() {
+const Header = ({ className }: { className?: string }) => {
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [active, setActive] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        setIsSignedIn(true);
+        const { data: userData, error } = await supabase
+          .from("users")
+          .select("profile_picture_url")
+          .eq("id", session.user.id)
+          .single();
+
+        if (userData) {
+          setProfilePic(userData.profile_picture_url || "/default-profile.png");
+        } else {
+          console.error(error.message);
+        }
+      } else {
+        setIsSignedIn(false);
+      }
+    };
+    checkUser();
+  }, []);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      // Clear the access token from local storage
+      localStorage.removeItem("access_token");
+      setIsSignedIn(false);
+      setProfilePic(null);
+      router.push("/");
+    } else {
+      console.error(error.message);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-16 items-center">
-      <div className="flex gap-8 justify-center items-center">
-        <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <SupabaseLogo />
-        </a>
-        <span className="border-l rotate-45 h-6" />
-        <a href="https://nextjs.org/" target="_blank" rel="noreferrer">
-          <NextLogo />
-        </a>
+    <div className="navbar bg-white flex text-black">
+      <div
+        className={cn(
+          "fixed top-10 inset-x-0 max-w-xl mx-auto z-50",
+          className
+        )}
+      >
+        <Menu setActive={setActive}>
+          <Link href="/" className="text-black">
+            Home
+          </Link>
+          {isSignedIn ? (
+            <>
+              <Link href="/projects" className="text-black">
+                Projects
+              </Link>
+              <Link href="/profile" className="text-black">
+                Profile
+              </Link>
+              <p className="cursor-pointer text-black" onClick={handleLogout}>
+                Logout
+              </p>
+            </>
+          ) : (
+            <>
+              <Link href="/api/auth/signin" className="text-black">
+                Sign In
+              </Link>
+              <Link href="/api/auth/signup" className="text-black">
+                Sign Up
+              </Link>
+            </>
+          )}
+        </Menu>
       </div>
-      <h1 className="sr-only">Supabase and Next.js Starter Template</h1>
-      <p className="text-3xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center">
-        The fastest way to build apps with{" "}
-        <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
-          className="font-bold hover:underline"
-          rel="noreferrer"
-        >
-          Supabase
-        </a>{" "}
-        and{" "}
-        <a
-          href="https://nextjs.org/"
-          target="_blank"
-          className="font-bold hover:underline"
-          rel="noreferrer"
-        >
-          Next.js
-        </a>
-      </p>
-      <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
     </div>
   );
-}
+};
+
+export default Header;
