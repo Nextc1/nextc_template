@@ -1,11 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import Pagination from "@/components/Pagination";
-import data from "@/data/fund.json";
+import data from "../../data/fund.json";
 import Link from "next/link";
 // import { HiCreditCard } from "react-icons/hi2";
 // import { FaLocationDot } from "react-icons/fa6";
-import { supabase } from "@/utils/supabase";
 
 interface Project {
   id: string;
@@ -34,16 +33,6 @@ const Projects: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(9);
   const [selectedStatus, setSelectedStatus] = useState("active");
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Function fectdata
-  async function fetchData() {
-    let data = await supabase.from("data").select("*");
-    console.log("data", data);
-  }
-
-  useEffect(() => {
-    fetchData();
-  });
 
   const projectData = getData().filter((project) => {
     return (
