@@ -81,10 +81,10 @@ const Header = ({ className }: { className?: string }) => {
             </>
           ) : (
             <>
-              <Link href="/api/auth/signin" className="text-black">
+              <Link href="/signin" className="text-black">
                 Sign In
               </Link>
-              <Link href="/api/auth/signup" className="text-black">
+              <Link href="/signup" className="text-black">
                 Sign Up
               </Link>
             </>

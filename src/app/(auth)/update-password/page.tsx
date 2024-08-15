@@ -37,7 +37,7 @@ export default function UpdatePassword() {
         setError(error.message);
       } else {
         // Redirect to sign-in page
-        router.push("/api/auth/signin");
+        router.push("/signin");
       }
     } catch (error) {
       setError("An unexpected error occurred. Please try again.");
