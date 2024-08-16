@@ -101,7 +101,7 @@ const Projects: React.FC = () => {
                 key={project.id}
               >
                 <img
-                  src={project.project_image}
+                  src={project.project_image[0]?.url}
                   alt={project.project_name}
                   className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
                 />

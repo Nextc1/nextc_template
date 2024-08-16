@@ -1,8 +1,6 @@
 "use client";
 import data from "../../data/invested.json";
 import Link from "next/link";
-import { HiCreditCard } from "react-icons/hi2";
-import { FaLocationDot } from "react-icons/fa6";
 
 function getData() {
   const response = data;
@@ -35,7 +33,7 @@ function page() {
                 <h3 className="mt-4 text-lg font-medium">
                   {project.project_name}
                 </h3>
-                <div className="card-actions justify-end">
+                {/* <div className="card-actions justify-end">
                   <div className="badge badge-outline flex gap-2">
                     <HiCreditCard />
                     {project.carbon_credits}
@@ -44,7 +42,7 @@ function page() {
                     <FaLocationDot />
                     {project.location}
                   </div>
-                </div>
+                </div> */}
               </div>
             </Link>
           ))}

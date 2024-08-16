@@ -5,14 +5,23 @@ import data from "../../../data/fund.json";
 import Timer from "@/components/Timer";
 import Loading from "@/components/Loader";
 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "../../../components/ui/carousel"
+
 interface TimerData {
   start_date: string;
   end_date: string;
 }
 
+
 interface ProjectData {
   id: string;
-  project_image: string;
+  project_image: any;
   project_name: string;
   company_name: string;
   location: string;
@@ -46,11 +55,19 @@ function ProjectId() {
         {projectData.map((project: ProjectData) => (
           <div className="flex flex-row p-10" key={project.id}>
             <div className="w-[60%] p-10">
-              <img
-                src={project.project_image}
-                alt={project.project_name}
-                className="w-full rounded-md"
-              />
+
+              <Carousel>
+                <CarouselContent>
+                  {project.project_image.map((item: any) => (
+                    <CarouselItem><img src={item.url} className="rounded-lg" /></CarouselItem>
+                  ))}
+                </CarouselContent>
+                <div className="w-full flex justify-center items-center gap-4">
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </div>
+              </Carousel>
+
             </div>
             <div className="p-10 rounded-md flex flex-col gap-4">
               <h1 className="text-3xl font-bold">{project.project_name}</h1>
