@@ -62,10 +62,8 @@ function ProjectId() {
                     <CarouselItem><img src={item.url} className="rounded-lg" /></CarouselItem>
                   ))}
                 </CarouselContent>
-                <div className="w-full flex justify-center items-center gap-4">
-                  <CarouselPrevious />
-                  <CarouselNext />
-                </div>
+                <CarouselPrevious />
+                <CarouselNext />
               </Carousel>
 
             </div>
