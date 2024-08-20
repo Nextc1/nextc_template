@@ -60,10 +60,10 @@ const Projects: React.FC = () => {
           Explore Projects
         </div>
         <div className="w-full my-[3rem] flex flex-row gap-4 justify-end">
-          <label className="input input-bordered flex items-center gap-2 bg-white border border-black w-full">
+          <label className="input input-bordered flex items-center gap-2 bg-white w-full rounded-md border border-black px-2">
             <input
               type="text"
-              className="text-black grow w-full"
+              className="text-black grow w-full p-2 rounded-md outline-none"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -72,7 +72,7 @@ const Projects: React.FC = () => {
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 16 16"
               fill="currentColor"
-              className="h-4 w-4 opacity-70 text-white"
+              className="h-4 w-4 opacity-70 text-black"
             >
               <path
                 fillRule="evenodd"
@@ -136,7 +136,7 @@ const Projects: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="text-center mt-[3rem]">
+        <div className="mt-[3rem] flex justify-center items-center">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

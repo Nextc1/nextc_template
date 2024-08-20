@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Link from "next/link";
 
 export function Hero() {
   return (
@@ -11,9 +11,9 @@ export function Hero() {
             {" "}
             Offset your carbon footprint with verified, impactful projects
           </p>
-          <button className="md:w-[20rem]  px-6 py-2 bg-transparent border border-black text-black rounded-lg font-bold transform hover:-translate-y-1 transition duration-400">
-            Explore Projects
-          </button>
+
+          <Link href="/projects" className="w-[15rem]"><button className="w-[15rem] px-6 py-2 bg-transparent border border-black text-black rounded-lg font-bold transform hover:-translate-y-1 transition duration-400">Explore Projects</button></Link>
+
         </div>
         <div className="w-full md:w-[50%] p-5 md:p-10">
           <img

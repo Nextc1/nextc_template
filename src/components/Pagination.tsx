@@ -22,7 +22,7 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="join">
+    <div className="join w-[15rem] border border-black flex justify-center items-center gap-4 rounded-md p-2">
       <button onClick={handlePreviousClick} className="join-item btn">
         «
       </button>
