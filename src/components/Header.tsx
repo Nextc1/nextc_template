@@ -75,7 +75,7 @@ const Header = ({ className }: { className?: string }) => {
               <Link href="/profile" className="text-black">
                 Profile
               </Link>
-              <p>Add Projects</p>
+              <link href="/" className="text-black">Add Projects</link>
               <p className="cursor-pointer text-black" onClick={handleLogout}>
                 Logout
               </p>
