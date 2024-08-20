@@ -41,7 +41,7 @@ const Timer: React.FC<TimerProps> = ({ startDate, endDate, isLoading }) => {
     return () => clearInterval(timerId);
   }, [endDate, isLoading]);
 
-  return <div className="text-white">{timeLeft}</div>;
+  return <div className="text-black">{timeLeft}</div>;
 };
 
 export default Timer;

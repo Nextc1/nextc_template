@@ -74,7 +74,7 @@ function ProjectId() {
               <p>Carbon Credits: {project.carbon_credits}</p>
               <p>Amount Raised: ${project.amount_for_raise}</p>
               <p>Emission Reduction: {project.emission_reduction}</p>
-              <p className="flex gap-2 text-black">
+              <p className="flex gap-2">
                 Time Left:{" "}
                 {project.timer.map((data, index) => (
                   <Timer
