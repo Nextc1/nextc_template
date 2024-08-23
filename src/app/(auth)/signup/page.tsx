@@ -1,21 +1,22 @@
 
-'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from '../../../utils/supabase';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/utils/cn';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/utils/cn";
 import { IconBrandGoogle } from "@tabler/icons-react";
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
-        email: '',
-        country: '',
-        password: ''
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        email: "",
+        country: "",
+        password: "",
     });
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -24,14 +25,15 @@ const SignUp = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value,
         });
     };
 
     const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
-        const { firstName, lastName, phoneNumber, email, country, password } = formData;
+        const { firstName, lastName, phoneNumber, email, country, password } =
+            formData;
 
         try {
             const { data, error } = await supabase.auth.signUp({
@@ -42,45 +44,45 @@ const SignUp = () => {
                         first_name: firstName,
                         last_name: lastName,
                         phone_number: phoneNumber,
-                        country: country
-                    }
-                }
+                        country: country,
+                    },
+                },
             });
 
             if (error) {
-                if (error.message.includes('Email rate limit exceeded')) {
-                    setError('Too many sign-up attempts. Please try again later.');
+                if (error.message.includes("Email rate limit exceeded")) {
+                    setError("Too many sign-up attempts. Please try again later.");
                 } else {
-                    setError('An error occurred during sign-up. Please try again.');
+                    setError("An error occurred during sign-up. Please try again.");
                 }
                 console.error(error);
             } else {
                 const user = data.user;
                 if (user) {
                     // Insert user details into the users table
-                    const { error: insertError } = await supabase
-                        .from('users')
-                        .insert({
-                            id: user.id,
-                            first_name: firstName,
-                            last_name: lastName,
-                            phone_number: phoneNumber,
-                            email: email,
-                            country: country
-                        });
+                    const { error: insertError } = await supabase.from("users").insert({
+                        id: user.id,
+                        first_name: firstName,
+                        last_name: lastName,
+                        phone_number: phoneNumber,
+                        email: email,
+                        country: country,
+                    });
 
                     if (insertError) {
-                        setError('An error occurred while saving user details. Please try again.');
+                        setError(
+                            "An error occurred while saving user details. Please try again."
+                        );
                         console.error(insertError);
                         // add check ur mail and confirm ------------------------------------------------------
                     } else if (data.session) {
-                        localStorage.setItem('access_token', data.session.access_token);
-                        router.push('/');
+                        localStorage.setItem("access_token", data.session.access_token);
+                        router.push("/");
                     }
                 }
             }
         } catch (err) {
-            setError('An unexpected error occurred. Please try again later.');
+            setError("An unexpected error occurred. Please try again later.");
             console.error(err);
         } finally {
             setLoading(false);
@@ -91,7 +93,7 @@ const SignUp = () => {
         setLoading(true);
         try {
             const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
+                provider: "google",
             });
 
             if (error) {
@@ -99,39 +101,37 @@ const SignUp = () => {
             }
 
             supabase.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_IN' && session) {
+                if (event === "SIGNED_IN" && session) {
                     const user = session.user;
-                    console.log('User Metadata:', user.user_metadata);
-                    
+                    console.log("User Metadata:", user.user_metadata);
+
                     // Insert or update user details in the users table
-                    const { error: insertError } = await supabase
-                        .from('users')
-                        .upsert({
-                            id: user.id,
-                            first_name: user.user_metadata?.first_name || '',
-                            last_name: user.user_metadata?.last_name || '',
-                            email: user.email,
-                            profile_picture_url: user.user_metadata?.picture || ''
-                        });
-            
+                    const { error: insertError } = await supabase.from("users").upsert({
+                        id: user.id,
+                        first_name: user.user_metadata?.first_name || "",
+                        last_name: user.user_metadata?.last_name || "",
+                        email: user.email,
+                        profile_picture_url: user.user_metadata?.picture || "",
+                    });
+
                     if (insertError) {
-                        setError('An error occurred while saving user details. Please try again.');
+                        setError(
+                            "An error occurred while saving user details. Please try again."
+                        );
                         console.error(insertError);
                     } else {
-                        localStorage.setItem('access_token', session.access_token);
-                        router.push('/');
+                        localStorage.setItem("access_token", session.access_token);
+                        router.push("/");
                     }
                 }
             });
-            
         } catch (err) {
-            setError('An unexpected error occurred. Please try again later.');
+            setError("An unexpected error occurred. Please try again later.");
             console.error(err);
         } finally {
             setLoading(false);
         }
     };
-
 
     // const handleGoogleSignIn = async () => {
     //     setLoading(true);
@@ -181,15 +181,14 @@ const SignUp = () => {
     //     }
     // };
 
-
     const navigateToSignIn = () => {
-        router.push('/api/auth/signin');
+        router.push("/api/auth/signin");
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-black p-8">
-            <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input glass dark:bg-black">
-                <h2 className="font-bold text-xl text-gray-200 dark:text-neutral-200 mb-6">
+        <div className="min-h-screen flex items-center justify-center bg-white  p-8">
+            <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 border border-black">
+                <h2 className="font-bold text-xl text-black mb-6">
                     Sign Up To Next-Carbon
                 </h2>
 
@@ -197,7 +196,9 @@ const SignUp = () => {
                 <form className="my-8" onSubmit={handleSignUp}>
                     <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
                         <LabelInputContainer>
-                            <Label htmlFor="firstName">First Name</Label>
+                            <Label htmlFor="firstName" className="text-black">
+                                First Name
+                            </Label>
                             <Input
                                 id="firstName"
                                 name="firstName"
@@ -209,7 +210,9 @@ const SignUp = () => {
                             />
                         </LabelInputContainer>
                         <LabelInputContainer>
-                            <Label htmlFor="lastName">Last Name</Label>
+                            <Label htmlFor="lastName" className="text-black">
+                                Last Name
+                            </Label>
                             <Input
                                 id="lastName"
                                 name="lastName"
@@ -223,7 +226,9 @@ const SignUp = () => {
                     </div>
                     <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
                         <LabelInputContainer>
-                            <Label htmlFor="phoneNumber">Phone Number</Label>
+                            <Label htmlFor="phoneNumber" className="text-black">
+                                Phone Number
+                            </Label>
                             <Input
                                 id="phoneNumber"
                                 name="phoneNumber"
@@ -235,7 +240,9 @@ const SignUp = () => {
                             />
                         </LabelInputContainer>
                         <LabelInputContainer>
-                            <Label htmlFor="email">Email Address</Label>
+                            <Label htmlFor="email" className="text-black">
+                                Email Address
+                            </Label>
                             <Input
                                 id="email"
                                 name="email"
@@ -248,7 +255,9 @@ const SignUp = () => {
                         </LabelInputContainer>
                     </div>
                     <LabelInputContainer className="mb-4">
-                        <Label htmlFor="country">Country</Label>
+                        <Label htmlFor="country" className="text-black">
+                            Country
+                        </Label>
                         <Input
                             id="country"
                             name="country"
@@ -260,7 +269,9 @@ const SignUp = () => {
                         />
                     </LabelInputContainer>
                     <LabelInputContainer className="mb-4">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password" className="text-black">
+                            Password
+                        </Label>
                         <Input
                             id="password"
                             name="password"
@@ -272,27 +283,27 @@ const SignUp = () => {
                         />
                     </LabelInputContainer>
                     <button
-                        className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+                        className="bg-gradient-to-br relative group/btn w-full bg-black text-white  rounded-md h-10 font-medium"
                         type="submit"
                         disabled={loading}
                     >
-                        {loading ? 'Signing Up...' : 'Sign Up'} &rarr;
+                        {loading ? "Signing Up..." : "Sign Up"} &rarr;
                         <BottomGradient />
                     </button>
                 </form>
-                <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+
                 <div className="flex flex-col space-y-4">
-                    <button
+                    {/* <button
                         onClick={handleGoogleSignIn}
-                        className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+                        className="relative group/btn flex space-x-2 justify-center items-center  px-4 w-full text-black rounded-md h-10 font-medium shadow-input border border-black"
                         disabled={loading}
                     >
                         <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
                         <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                            {loading ? 'Signing In...' : 'Sign Up with Google'}
+                            {loading ? "Signing In..." : "Sign Up with Google"}
                         </span>
                         <BottomGradient />
-                    </button>
+                    </button> */}
                     <button
                         onClick={navigateToSignIn}
                         className="relative group/btn flex space-x-2 items-center justify-center px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
@@ -332,4 +343,3 @@ const LabelInputContainer = ({
 };
 
 export default SignUp;
-
