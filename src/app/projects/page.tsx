@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import Pagination from "@/components/Pagination";
-import data from "../../data/fund.json";
+import dataa from "../../data/fund.json";
 import Link from "next/link";
 // import { HiCreditCard } from "react-icons/hi2";
 // import { FaLocationDot } from "react-icons/fa6";
+import { supabase } from "@/utils/supabase";
 
 interface Project {
   id: string;
@@ -23,18 +24,23 @@ interface Project {
   status: string;
 }
 
-function getData() {
-  const response = data;
-  return response;
-}
 
 const Projects: React.FC = () => {
+  const [datas, setDatas] = useState<any>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(9);
   const [selectedStatus, setSelectedStatus] = useState("active");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const projectData = getData().filter((project) => {
+  async function get() {
+    const { data: data, error } = await supabase.from("data").select("*");
+    return data;
+  }
+
+  const check = JSON.stringify(dataa);
+  console.log("check", check);
+
+  const projectData = datas.filter((project: any) => {
     return (
       (selectedStatus === "all" || project.status === selectedStatus) &&
       project.project_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -48,10 +54,17 @@ const Projects: React.FC = () => {
   const totalPages = Math.ceil(projectData.length / itemsPerPage);
 
   useEffect(() => {
+    (async () => {
+      const rresult = await get();
+      setDatas(rresult);
+    })();
+
     if (currentPage > totalPages) {
       setCurrentPage(totalPages > 0 ? totalPages : 1);
     }
-  }, [totalPages, currentPage]);
+  }, []);
+
+  console.log("projectData", projectData);
 
   return (
     <>
@@ -94,14 +107,14 @@ const Projects: React.FC = () => {
         </div>
         <div className="w-full flex flex-wrap gap-5 justify-evenly">
           {currentItems.length > 0 ? (
-            currentItems.map((project) => (
+            currentItems.map((project: Project) => (
               <Link
                 href={`/projects/${project.id}`}
                 className="w-[350px] group relative block overflow-hidden rounded-lg shadow-lg transition duration-500 hover:shadow-xl text-black border border-black my-5"
                 key={project.id}
               >
                 <img
-                  src={project.project_image[0]?.url}
+                  src={project.project_image}
                   alt={project.project_name}
                   className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
                 />
