@@ -22,16 +22,16 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="join w-[15rem] border border-black flex justify-center items-center gap-4 rounded-md p-2">
-      <button onClick={handlePreviousClick} className="join-item btn">
+    <div className="join w-[12rem] border border-black flex justify-center items-center gap-4 rounded-md p-2">
+      <button onClick={handlePreviousClick} className="join-item  bg-white">
         «
       </button>
-      <span className="join-item btn">
+      <span className="join-item">
         {" "}
         Page {currentPage} of {totalPages}{" "}
       </span>
-      <button onClick={handleNextClick} className="join-item btn">
-        »
+      <button onClick={handleNextClick} className="join-item  bg-white">
+        » 
       </button>
     </div>
   );

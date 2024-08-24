@@ -35,26 +35,26 @@ const ProfilePage = () => {
   const [fieldValue, setFieldValue] = useState<string>('');
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+  // useEffect(() => {
+  //   const fetchUserProfile = async () => {
+  //     const { data: { user } } = await supabase.auth.getUser();
+  //     if (user) {
+  //       const { data, error } = await supabase
+  //         .from('users')
+  //         .select('*')
+  //         .eq('id', user.id)
+  //         .single();
 
-        if (data) {
-          setUser(data);
-        } else {
-          console.error(error);
-        }
-      }
-    };
+  //       if (data) {
+  //         setUser(data);
+  //       } else {
+  //         console.error(error);
+  //       }
+  //     }
+  //   };
 
-    fetchUserProfile();
-  }, []);
+  //   fetchUserProfile();
+  // }, []);
 
   const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -1,10 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import Pagination from "@/components/Pagination";
-import data from "../../data/fund.json";
 import Link from "next/link";
-// import { HiCreditCard } from "react-icons/hi2";
-// import { FaLocationDot } from "react-icons/fa6";
+import { supabase } from "../../utils/supabase";
+import Loading from "@/components/Loader";
 
 interface Project {
   id: string;
@@ -23,18 +22,28 @@ interface Project {
   status: string;
 }
 
-function getData() {
-  const response = data;
-  return response;
-}
-
 const Projects: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [pprojectData, setPprojectData]: any = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(9);
   const [selectedStatus, setSelectedStatus] = useState("active");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const projectData = getData().filter((project) => {
+  useEffect(() => {
+    async function getData() {
+      let { data: project_data, error } = await supabase
+        .from("project_data")
+        .select("*");
+      // console.log(project_data)
+      setPprojectData(project_data);
+      setLoading(false);
+    }
+
+    getData();
+  }, []);
+
+  const projectData = pprojectData.filter((project: any) => {
     return (
       (selectedStatus === "all" || project.status === selectedStatus) &&
       project.project_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -92,50 +101,63 @@ const Projects: React.FC = () => {
             <option value="done">Done</option>
           </select>
         </div>
-        <div className="w-full flex flex-wrap gap-5 justify-evenly">
-          {currentItems.length > 0 ? (
-            currentItems.map((project) => (
-              <Link
-                href={`/projects/${project.id}`}
-                className="w-[350px] group relative block overflow-hidden rounded-lg shadow-lg transition duration-500 hover:shadow-xl text-black border border-black my-5"
-                key={project.id}
-              >
-                <img
-                  src={project.project_image[0]?.url}
-                  alt={project.project_name}
-                  className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
-                />
-
-                <div className="relative bg-white p-6 text-black">
-                  <span className="whitespace-nowrap bg-green-600 text-white rounded-md px-3 py-1.5 text-xs font-medium">
-                    {project.status}
-                  </span>
-
-                  <h3 className="mt-4 text-lg font-medium">
-                    {project.project_name}
-                  </h3>
-
-                  <p className="mt-1.5 text-sm">$ {project.amount_for_raise}</p>
-
-                  <div className="card-actions justify-end">
-                    <div className="badge badge-outline flex gap-2">
-                      {/* <HiCreditCard /> */}
-                      {project.carbon_credits}
-                    </div>
-                    <div className="badge badge-outline flex gap-2">
-                      {/* <FaLocationDot /> */}
-                      {project.location}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <div className="h-screen flex flex-col justify-center items-center text-3xl font-bold">
-              Project Not Found
+        {loading ? (
+          <>
+            <div className="h-screen flex justify-center items-center text-3xl font-bold">
+              <Loading />
             </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <>
+            <div className="w-full flex flex-wrap gap-5 justify-evenly">
+              {currentItems.length > 0 ? (
+                currentItems.map((project: any) => (
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="w-[350px] group relative block overflow-hidden rounded-lg shadow-lg transition duration-500 hover:shadow-xl text-black border border-black my-5"
+                    key={project.id}
+                  >
+                    <img
+                      src={project.project_image[0]?.url}
+                      alt={project.project_name}
+                      className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
+                    />
+
+                    <div className="relative bg-white p-6 text-black">
+                      <span className="whitespace-nowrap bg-green-600 text-white rounded-md px-3 py-1.5 text-xs font-medium">
+                        {project.status}
+                      </span>
+
+                      <h3 className="mt-4 text-lg font-medium">
+                        {project.project_name}
+                      </h3>
+
+                      <p className="mt-1.5 text-sm">
+                        $ {project.amount_for_raise}
+                      </p>
+
+                      <div className="card-actions justify-end">
+                        <div className="badge badge-outline flex gap-2">
+                          {/* <HiCreditCard /> */}
+                          {project.carbon_credits}
+                        </div>
+                        <div className="badge badge-outline flex gap-2">
+                          {/* <FaLocationDot /> */}
+                          {project.location}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="h-screen flex flex-col justify-center items-center text-3xl font-bold">
+                  Project Not Found
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
         <div className="mt-[3rem] flex justify-center items-center">
           <Pagination
             currentPage={currentPage}
