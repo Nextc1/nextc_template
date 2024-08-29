@@ -13,7 +13,7 @@ export default function Home() {
 
   const result  = getData()
 
-  console.log(result);
+  // console.log(result);
   
 
   return (
