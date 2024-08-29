@@ -25,24 +25,16 @@ interface Project {
 }
 
 async function getData1() {
+  let { data: data, error } = await supabase.from("project_data").select("*");
 
-  let { data, error } = await supabase
-  .from('project_data')
-  .select('*')
-
-
-  const data1=data
-return data1;
+  console.log("Projects", data);
+  return data;
 }
-getData1().then((data1) => {
-  console.log("supabasee  "+data1); // Use the data as needed
-});
-
-
+getData1();
 
 function getData() {
   const response = data;
-  
+
   return response;
 }
 
