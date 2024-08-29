@@ -1,11 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import Pagination from "@/components/Pagination";
-import dataa from "../../data/fund.json";
+import data from "../../data/fund.json";
 import Link from "next/link";
 // import { HiCreditCard } from "react-icons/hi2";
 // import { FaLocationDot } from "react-icons/fa6";
-import { supabase } from "@/utils/supabase";
 
 interface Project {
   id: string;
@@ -24,23 +23,19 @@ interface Project {
   status: string;
 }
 
+function getData() {
+  const response = data;
+  console.log(response);
+  return response;
+}
 
 const Projects: React.FC = () => {
-  const [datas, setDatas] = useState<any>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(9);
   const [selectedStatus, setSelectedStatus] = useState("active");
   const [searchTerm, setSearchTerm] = useState("");
 
-  async function get() {
-    const { data: data, error } = await supabase.from("data").select("*");
-    return data;
-  }
-
-  const check = JSON.stringify(dataa);
-  console.log("check", check);
-
-  const projectData = datas.filter((project: any) => {
+  const projectData = getData().filter((project) => {
     return (
       (selectedStatus === "all" || project.status === selectedStatus) &&
       project.project_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -54,17 +49,10 @@ const Projects: React.FC = () => {
   const totalPages = Math.ceil(projectData.length / itemsPerPage);
 
   useEffect(() => {
-    (async () => {
-      const rresult = await get();
-      setDatas(rresult);
-    })();
-
     if (currentPage > totalPages) {
       setCurrentPage(totalPages > 0 ? totalPages : 1);
     }
-  }, []);
-
-  console.log("projectData", projectData);
+  }, [totalPages, currentPage]);
 
   return (
     <>
@@ -73,10 +61,10 @@ const Projects: React.FC = () => {
           Explore Projects
         </div>
         <div className="w-full my-[3rem] flex flex-row gap-4 justify-end">
-          <label className="input input-bordered flex items-center gap-2 bg-white w-full rounded-md border border-black px-2">
+          <label className="input input-bordered flex items-center gap-2 bg-white border border-black w-full">
             <input
               type="text"
-              className="text-black grow w-full p-2 rounded-md outline-none"
+              className="text-black grow w-full"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -85,7 +73,7 @@ const Projects: React.FC = () => {
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 16 16"
               fill="currentColor"
-              className="h-4 w-4 opacity-70 text-black"
+              className="h-4 w-4 opacity-70 text-white"
             >
               <path
                 fillRule="evenodd"
@@ -107,14 +95,14 @@ const Projects: React.FC = () => {
         </div>
         <div className="w-full flex flex-wrap gap-5 justify-evenly">
           {currentItems.length > 0 ? (
-            currentItems.map((project: Project) => (
+            currentItems.map((project) => (
               <Link
                 href={`/projects/${project.id}`}
                 className="w-[350px] group relative block overflow-hidden rounded-lg shadow-lg transition duration-500 hover:shadow-xl text-black border border-black my-5"
                 key={project.id}
               >
                 <img
-                  src={project.project_image}
+                  src={project.project_image[0]?.url}
                   alt={project.project_name}
                   className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
                 />
@@ -149,7 +137,7 @@ const Projects: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="mt-[3rem] flex justify-center items-center">
+        <div className="text-center mt-[3rem]">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
