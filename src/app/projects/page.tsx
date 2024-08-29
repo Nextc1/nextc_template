@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Pagination from "@/components/Pagination";
 import data from "../../data/fund.json";
 import Link from "next/link";
+import { supabase } from "@/utils/supabase";
 // import { HiCreditCard } from "react-icons/hi2";
 // import { FaLocationDot } from "react-icons/fa6";
 
@@ -23,9 +24,25 @@ interface Project {
   status: string;
 }
 
+async function getData1() {
+
+  let { data, error } = await supabase
+  .from('project_data')
+  .select('*')
+
+
+  const data1=data
+return data1;
+}
+getData1().then((data1) => {
+  console.log("supabasee  "+data1); // Use the data as needed
+});
+
+
+
 function getData() {
   const response = data;
-  console.log(response);
+  
   return response;
 }
 
