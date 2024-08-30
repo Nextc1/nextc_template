@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import data from "../../../data/fund.json";
 import Timer from "@/components/Timer";
 import Loading from "@/components/Loader";
 
@@ -11,13 +10,13 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "../../../components/ui/carousel"
+} from "../../../components/ui/carousel";
+import { supabase } from "../../../utils/supabase";
 
 interface TimerData {
   start_date: string;
   end_date: string;
 }
-
 
 interface ProjectData {
   id: string;
@@ -34,16 +33,27 @@ interface ProjectData {
 
 function ProjectId() {
   const params = useParams();
-  const projectId = params.projectId as string;
+  const { projectId } = params;
   const [projectData, setProjectData] = useState<ProjectData[]>([]);
-  const [isLoading, setIsLoading] = useState(true); // Added loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true); // Start loading
-    const response: any = data.filter((item) => item.id === projectId);
-    setProjectData(response);
-    setIsLoading(false); // End loading
-  }, [projectId]);
+    async function getData() {
+      let { data, error }: any = await supabase
+        .from("project_data")
+        .select("*")
+        .eq("id", projectId);
+      if (error) {
+        console.error("Error fetching event details:", error);
+      } else {
+        setProjectData(data);
+      }
+      setIsLoading(false);
+    }
+    if (projectId) {
+      getData();
+    }
+  }, []);
 
   if (isLoading) {
     return <Loading />; // Display loading indicator if data is loading
@@ -55,17 +65,17 @@ function ProjectId() {
         {projectData.map((project: ProjectData) => (
           <div className="flex flex-row p-10" key={project.id}>
             <div className="w-[60%] p-10">
-
               <Carousel>
                 <CarouselContent>
                   {project.project_image.map((item: any) => (
-                    <CarouselItem><img src={item.url} className="rounded-lg" /></CarouselItem>
+                    <CarouselItem>
+                      <img src={item.url} className="rounded-lg" />
+                    </CarouselItem>
                   ))}
                 </CarouselContent>
                 <CarouselPrevious />
                 <CarouselNext />
               </Carousel>
-
             </div>
             <div className="p-10 rounded-md flex flex-col gap-4">
               <h1 className="text-3xl font-bold">{project.project_name}</h1>
