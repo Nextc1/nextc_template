@@ -4,12 +4,37 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "../../utils/supabase";
 import { useRef, ChangeEvent, useState, useTransition, useEffect } from "react";
+import { convertBlobUrlToFile } from "../../action/convertBlobUrlToFile";
+import { uploadImage } from "../../action/uploadSupabase";
+
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function AddProject() {
-  const [user, setUser]: any = useState(null);
-
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [isError, setIsError] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+
+      if (file) {
+        const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+        if (file.size > maxSizeInBytes) {
+          setIsError("File size should be less than 2MB.");
+          e.target.value = "";
+          return;
+        }
+
+        const newImageUrls = [URL.createObjectURL(file)];
+
+        setImageUrls(newImageUrls);
+      }
+    }
+  };
 
   const {
     register,
@@ -43,6 +68,36 @@ export default function AddProject() {
       console.error("No data returned from the insert operation.");
       return;
     }
+
+    startTransition(async () => {
+      let urls = [];
+      for (const url of imageUrls) {
+        const imageFile = await convertBlobUrlToFile(url);
+
+        const { imageUrl, error } = await uploadImage({
+          file: imageFile,
+          bucket: "project_image",
+        });
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        urls.push(imageUrl);
+        // console.log(imageUrl);
+      }
+      const { data: imageData, error: imageError }: any = await supabase
+        .from("project_images")
+        .insert([
+          {
+            project_id: data[0].id,
+            url: urls,
+          },
+        ])
+        .select();
+      setImageUrls([]);
+    });
   };
 
   return (
@@ -134,12 +189,45 @@ export default function AddProject() {
           </select>
         </div>
 
+        <div className="w-full flex flex-col gap-2">
+          <label htmlFor="event_image">Project Images: </label>
+          <input
+            id="project_image"
+            type="file"
+            accept="image/jpeg, image/png"
+            ref={imageInputRef}
+            onChange={(e) => handleImageChange(e)}
+            disabled={isPending}
+            className="w-full border border-black p-2 rounded-md bg-white text-black"
+          />
+          <p className="text-red-500">{isError}</p>
+        </div>
+
+        <div className="w-full flex flex-wrap justify-start items-center gap-4">
+          {imageUrls.length > 0 ? (
+            <>
+              {imageUrls.map((url, index) => (
+                <Image
+                  width={100}
+                  height={100}
+                  key={url}
+                  src={url}
+                  alt={`img-${index}`}
+                  className="w-auto h-auto border border-white rounded-lg object-contain"
+                />
+              ))}
+            </>
+          ) : (
+            <h1>Image Preview Here...</h1>
+          )}
+        </div>
+
         <button
           type="submit"
-          className="w-full border border-black p-2 rounded-md bg-white text-blac
-           hover:bg-black hover:text-white"
+          className="w-full border border-black p-2 rounded-md bg-white text-black hover:bg-black hover:text-white"
+          disabled={isPending}
         >
-          Submit
+          {isPending ? "Submitting..." : "Submit"}
         </button>
       </form>
     </div>

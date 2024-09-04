@@ -1,47 +1,55 @@
 "use client";
 import { useState, useEffect } from "react";
-import Pagination from "@/components/Pagination";
+import Pagination from "../../components/Pagination";
+import { supabase } from "../../utils/supabase";
 import Link from "next/link";
-import { supabase } from "@/utils/supabase";
-import Loading from "../loading";
+import Image from "next/image";
+import Loading from "../../components/Loader";
+import { CiLocationOn } from "react-icons/ci";
 
-interface Project {
-  id: string;
-  project_name: string;
-  project_image: string;
-  carbon_credits: number;
-  emission_reduction: number;
-  amount_for_raise: number;
-  company_name: string;
+interface projectData {
+  id: number;
+  title: string;
+  description: string;
+  categories: string[];
+  image: string;
   location: string;
-  timer: {
-    start_date: string;
-    end_date: string;
-    ended: boolean;
-  };
-  status: string;
+  startDateTime: string;
+  endDateTime: string;
+  participants: string[];
+  seats: number;
+  websiteLink: string;
+  price: number;
+  status: "active" | "upcoming" | "inactive";
+  tags: string[];
 }
 
-const Projects: React.FC = () => {
-  const [data, setData]: any = useState([]);
+const Page: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [project, setProject]: any = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(9);
   const [selectedStatus, setSelectedStatus] = useState("active");
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    async function getData1() {
-      let { data: data, error } = await supabase
+    async function getData() {
+      let { data, error }: any = await supabase
         .from("project_data")
-        .select("*");
-      setData(data);
+        .select("*,project_images(project_id,url)");
+      if (error) {
+        console.error("Error fetching project details:", error);
+      } else {
+        setProject(data);
+        // console.log(data);
+        // console.log(data[0].project_images[0].url);
+      }
       setLoading(false);
     }
-    getData1();
-  });
+    getData();
+  }, []);
 
-  const projectData = data.filter((project: any) => {
+  const projectData = project.filter((project: any) => {
     return (
       (selectedStatus === "all" || project.status === selectedStatus) &&
       project.project_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -62,15 +70,15 @@ const Projects: React.FC = () => {
 
   return (
     <>
-      <div className="w-full h-full bg-white text-black py-[5rem] px-[2rem]">
+      <div className="absolute top-0 w-full h-auto bg-white text-black py-[8rem] px-[2rem]">
         <div className="text-center my-10 text-4xl font-bold">
-          Explore Projects
+          Explore projects
         </div>
         <div className="w-full my-[3rem] flex flex-row gap-4 justify-end">
           <label className="input input-bordered flex items-center gap-2 bg-white border border-black w-full">
             <input
               type="text"
-              className="text-black grow w-full"
+              className="text-white grow w-full"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -88,8 +96,8 @@ const Projects: React.FC = () => {
               />
             </svg>
           </label>
-          <select
-            className="w-[8rem] bg-white text-start text-black border border-black outline-black rounded-md"
+          {/* <select
+            className="w-[8rem] bg-black text-start text-white border border-white outline-black rounded-md"
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
           >
@@ -97,57 +105,43 @@ const Projects: React.FC = () => {
             <option value="active">Active</option>
             <option value="upcoming">Upcoming</option>
             <option value="done">Done</option>
-          </select>
+          </select> */}
         </div>
         {loading ? (
-          <>
-            <Loading />
-          </>
+          <Loading />
         ) : (
           <>
             <div className="w-full flex flex-wrap gap-5 justify-evenly">
-              {currentItems.length > 0 ? (
-                currentItems.map((project: any) => (
+              {project.length > 0 ? (
+                project.map((project: any) => (
                   <Link
-                    href={`/projects/${project.id}`}
+                    href={`/explore-projects/${project.id}`}
                     className="w-[350px] group relative block overflow-hidden rounded-lg shadow-lg transition duration-500 hover:shadow-xl text-black border border-black my-5"
                     key={project.id}
                   >
-                    <img
-                      src={project.project_image[0]?.url}
+                    <Image
+                      width="500"
+                      height="500"
+                      src={JSON.parse(project.project_images[0]?.url)[0]}
                       alt={project.project_name}
                       className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
                     />
 
-                    <div className="relative bg-white p-6 text-black">
-                      <span className="whitespace-nowrap bg-green-600 text-white rounded-md px-3 py-1.5 text-xs font-medium">
-                        {project.status}
-                      </span>
-
-                      <h3 className="mt-4 text-lg font-medium">
-                        {project.project_name}
-                      </h3>
-
-                      <p className="mt-1.5 text-sm">
-                        $ {project.amount_for_raise}
-                      </p>
-
-                      <div className="card-actions justify-end">
-                        <div className="badge badge-outline flex gap-2">
-                          {/* <HiCreditCard /> */}
-                          {project.carbon_credits}
-                        </div>
-                        <div className="badge badge-outline flex gap-2">
-                          {/* <FaLocationDot /> */}
-                          {project.location}
-                        </div>
+                    <div className="relative bg-white p-6 text-black h-full">
+                      <p>{project.project_name}</p>
+                      <div className="flex flex-row gap-4">
+                        <p>{project.carbon_credits} </p>
+                        <p className="flex gap-1">
+                          {project.emission_reduction}{" "}
+                        </p>
                       </div>
+                      <p className="flex gap-1">{project.amount_for_raise}</p>
                     </div>
                   </Link>
                 ))
               ) : (
                 <div className="h-screen flex flex-col justify-center items-center text-3xl font-bold">
-                  Project Not Found
+                  project Not Found
                 </div>
               )}
             </div>
@@ -166,4 +160,4 @@ const Projects: React.FC = () => {
   );
 };
 
-export default Projects;
+export default Page;
