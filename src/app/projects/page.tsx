@@ -129,6 +129,15 @@ const Page: React.FC = () => {
                         No investment data available
                       </div>
                     )}
+                    <div
+                      className={`w-20 h-6 px-4 mt-2 text-white rounded-full ${
+                        project.status === "active"
+                          ? "bg-green-700"
+                          : "bg-red-700"
+                      }`}
+                    >
+                      {project.status}
+                    </div>
                   </div>
                 </Link>
               ))
