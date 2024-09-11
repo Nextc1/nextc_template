@@ -131,12 +131,13 @@ const ProfilePage = () => {
         [editableField]: fieldValue
       };
 
-      const { error } = await supabase
+      const { data ,error } = await supabase
         .from('users')
         .update(updates)
         .eq('id', user.id);
 
       if (!error) {
+        console.log(data)
         setUser({ ...user, [editableField]: fieldValue });
         setEditableField(null);
         setFieldValue('');

@@ -10,6 +10,7 @@ const Page: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [projectData, setProjectData] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
   useEffect(() => {
     async function getData() {
@@ -25,6 +26,17 @@ const Page: React.FC = () => {
     }
     getData();
   }, []);
+
+  const filteredData = projectData.filter((project: any) => {
+    const matchesStatus =
+      selectedStatus === "all" || project.status === selectedStatus;
+    const matchesSearchTerm =
+      project.project_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.location.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesStatus && matchesSearchTerm;
+  });
 
   return (
     <>
@@ -54,13 +66,23 @@ const Page: React.FC = () => {
               />
             </svg>
           </label>
+          <select
+            className="w-[8rem] bg-white text-start text-black border border-black outline-black rounded-md"
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+          >
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="done">Done</option>
+          </select>
         </div>
         {loading ? (
           <Loading />
         ) : (
           <div className="w-full flex flex-wrap gap-5 justify-evenly">
-            {projectData.length > 0 ? (
-              projectData.map((project: any) => (
+            {filteredData.length > 0 ? (
+              filteredData.map((project: any) => (
                 <Link
                   href={`/projects/${project.id}`}
                   className="w-[350px] group relative block overflow-hidden rounded-lg shadow-lg transition duration-500 hover:shadow-xl text-black border border-gray-300 my-5"

@@ -41,15 +41,15 @@ function ProjectId() {
   return (
     <div className="w-full bg-white text-black py-[6rem] px-[2rem]">
       <div className="flex flex-row p-10">
-        <div className="w-[60%] p-10">
+        <div className="w-[50%] p-10">
           {img.map((i: any) => (
             <div key={i}>
               <Image
                 src={i}
                 alt="event image"
-                className="w-full"
                 width={500}
                 height={500}
+                className="w-full h-[400px] object-contain rounded-md"
                 loading="lazy"
               />
             </div>
@@ -62,7 +62,13 @@ function ProjectId() {
           <p>Carbon Credits: {projectData[0].carbon_credits}</p>
           <p>Amount Raised: ${projectData[0].amount_for_raise}</p>
           <p>Emission Reduction: {projectData[0].emission_reduction}</p>
-          <div className="bg-green-600 text-white rounded-md text-center w-[5rem] p-2 text-xs font-medium">
+          <div
+            className={`w-20 h-6 pl-4  mt-2 text-white rounded-full ${
+              projectData[0].status == "active"
+                ? `bg-green-700`
+                : `bg-red-700 pl-2 pr-4`
+            }`}
+          >
             {projectData[0].status}
           </div>
           {projectData[0].investment_data &&

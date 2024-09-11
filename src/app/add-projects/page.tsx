@@ -195,6 +195,7 @@ export default function AddProject() {
             id="project_image"
             type="file"
             accept="image/jpeg, image/png"
+            multiple={true}
             ref={imageInputRef}
             onChange={(e) => handleImageChange(e)}
             disabled={isPending}
